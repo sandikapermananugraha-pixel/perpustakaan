@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perpustakaan SMKN 1 Gedong Tataan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f3f4f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .header-gradient {
+            background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header-gradient p-4 shadow-md text-white text-center flex justify-center items-center gap-2">
+        <span class="text-2xl">📚</span>
+        <h1 class="text-2xl font-bold uppercase tracking-wide">Perpustakaan SMKN 1 Gedong Tataan</h1>
+    </header>
+
+    <main class="max-w-7xl mx-auto mt-8 p-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <section class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-blue-500 h-fit">
+            <h2 class="text-xl font-bold mb-6 text-gray-800">Tambah Buku</h2>
+            <form id="bookForm" class="space-y-4">
+                <input type="text" id="judul" placeholder="Judul Buku" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+                <input type="text" id="penerbit" placeholder="Penerbit" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+                <input type="number" id="tahun" placeholder="Tahun" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+                <input type="number" id="stok" placeholder="Stok" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+                <div class="flex flex-col">
+                    <input type="file" id="sampul" accept="image/*" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                    Tambah
+                </button>
+            </form>
+        </section>
+
+        <section class="lg:col-span-2 bg-white p-6 rounded-lg shadow-lg border-t-4 border-blue-500 overflow-x-auto">
+            <h2 class="text-xl font-bold mb-6 text-gray-800">Data Buku</h2>
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-blue-600 text-white">
+                        <th class="p-3 text-center border">Sampul</th>
+                        <th class="p-3 border">Judul</th>
+                        <th class="p-3 border">Penerbit</th>
+                        <th class="p-3 border text-center">Tahun</th>
+                        <th class="p-3 border text-center">Stok</th>
+                        <th class="p-3 border text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="bookTableBody">
+                    </tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <script>
+        const bookForm = document.getElementById('bookForm');
+        const bookTableBody = document.getElementById('bookTableBody');
+
+        bookForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Ambil data dari input
+            const judul = document.getElementById('judul').value;
+            const penerbit = document.getElementById('penerbit').value;
+            const tahun = document.getElementById('tahun').value;
+            const stok = document.getElementById('stok').value;
+            const sampulInput = document.getElementById('sampul');
+            
+            // Logika sederhana untuk menampilkan gambar (Local Preview)
+            let imgTag = '<span class="text-gray-400 italic">No Image</span>';
+            if (sampulInput.files && sampulInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const imageUrl = event.target.result;
+                    addTableRow(judul, penerbit, tahun, stok, imageUrl);
+                };
+                reader.readAsDataURL(sampulInput.files[0]);
+            } else {
+                addTableRow(judul, penerbit, tahun, stok, null);
+            }
+
+            // Reset Form
+            bookForm.reset();
+        });
+
+        function addTableRow(judul, penerbit, tahun, stok, imageUrl) {
+            const row = document.createElement('tr');
+            row.className = "hover:bg-gray-50 transition border-b";
+
+            const imgHtml = imageUrl ? `<img src="${imageUrl}" class="h-16 w-12 object-cover mx-auto rounded shadow-sm">` : 'N/A';
+
+            row.innerHTML = `
+                <td class="p-3 text-center border">${imgHtml}</td>
+                <td class="p-3 border font-medium">${judul}</td>
+                <td class="p-3 border">${penerbit}</td>
+                <td class="p-3 border text-center">${tahun}</td>
+                <td class="p-3 border text-center font-bold">${stok}</td>
+                <td class="p-3 border text-center">
+                    <button onclick="this.parentElement.parentElement.remove()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs">
+                        <i class="fa-solid fa-trash"></i> Hapus
+                    </button>
+                </td>
+            `;
+
+            bookTableBody.appendChild(row);
+        }
+    </script>
+
+</body>
+</html>
