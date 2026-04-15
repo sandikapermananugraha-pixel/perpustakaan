@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Portfolio App</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #333;
+}
+
+.wrapper {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    font-size: 2.5rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+}
+
+.card {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 20px;
+    color: white;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+h2 {
+    margin-bottom: 15px;
+}
+
+/* FORM */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+}
+
+button {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #00f2fe;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #4facfe;
+}
+
+/* LIST */
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(255,255,255,0.2);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    transition: 0.3s;
+}
+
+.profile:hover {
+    transform: translateY(-5px);
+}
+
+.profile img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+}
+
+.info h3 {
+    margin-bottom: 5px;
+}
+
+.skill {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.actions {
+    margin-top: 10px;
+}
+
+.actions button {
+    margin-right: 5px;
+    background: #ffd166;
+}
+
+.actions .delete {
+    background: #ef476f;
+    color: white;
+}
+
+/* RESPONSIVE */
+@media(max-width: 768px){
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+<header>
+    <h1>✨ Portofolio XSanszu</h1>
+    <p><b>data diri dengan portofolio XSanszu yang kece ygy</b></p>
+</header>
+
+<div class="grid">
+
+    <!-- FORM -->
+    <div class="card form-card">
+        <h2>Tambah / Edit Data</h2>
+
+        <form id="form">
+            <input type="hidden" id="index">
+
+            <input type="text" id="nama" placeholder="Nama Lengkap" required>
+            <input type="text" id="ttl" placeholder="Tempat, Tanggal Lahir" required>
+            <input type="text" id="alamat" placeholder="Alamat Rumah" required>
+            <input type="text" id="pekerjaan" placeholder="Sekolah / Pekerjaan" required>
+            <input type="text" id="skill" placeholder="Skill (pisahkan koma)" required>
+            <input type="file" id="foto" accept="image/*">
+
+            <button type="submit">💾 Simpan</button>
+        </form>
+    </div>
+
+    <!-- LIST -->
+    <div class="card list-card">
+        <h2>Data Portfolio</h2>
+        <div id="list"></div>
+    </div>
+
+</div>
+</div>
+
+<script>
+let data = JSON.parse(localStorage.getItem("portfolio")) || [];
+
+function render() {
+    const list = document.getElementById("list");
+    list.innerHTML = "";
+
+    data.forEach((item, index) => {
+        list.innerHTML += `
+        <div class="profile">
+            <img src="${item.foto || 'https://via.placeholder.com/100'}">
+            <div class="info">
+                <h3>${item.nama}</h3>
+                <p>${item.ttl}</p>
+                <p>${item.alamat}</p>
+                <p>${item.pekerjaan}</p>
+                <p class="skill">💡 ${item.skill}</p>
+
+                <div class="actions">
+                    <button onclick="edit(${index})">Edit</button>
+                    <button class="delete" onclick="hapus(${index})">Hapus</button>
+                </div>
+            </div>
+        </div>
+        `;
+    });
+
+    localStorage.setItem("portfolio", JSON.stringify(data));
+}
+
+document.getElementById("form").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const index = document.getElementById("index").value;
+    const file = document.getElementById("foto").files[0];
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function() {
+            save(reader.result, index);
+        };
+        reader.readAsDataURL(file);
+    } else {
+        save(null, index);
+    }
+});
+
+function save(foto, index) {
+    const item = {
+        nama: nama.value,
+        ttl: ttl.value,
+        alamat: alamat.value,
+        pekerjaan: pekerjaan.value,
+        skill: skill.value,
+        foto: foto
+    };
+
+    if (index === "") {
+        data.push(item);
+    } else {
+        data[index] = item;
+    }
+
+    form.reset();
+    document.getElementById("index").value = "";
+    render();
+}
+
+function edit(i) {
+    const d = data[i];
+
+    nama.value = d.nama;
+    ttl.value = d.ttl;
+    alamat.value = d.alamat;
+    pekerjaan.value = d.pekerjaan;
+    skill.value = d.skill;
+    index.value = i;
+}
+
+function hapus(i) {
+    if(confirm("Hapus data ini?")) {
+        data.splice(i,1);
+        render();
+    }
+}
+
+render();
+</script>
+
+</body>
+</html>
